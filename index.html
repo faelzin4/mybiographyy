@@ -4,1258 +4,291 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rafael Ubinski</title>
-
-  <!-- ─────────────────────────────────────────────
-       FONTES
-       Playfair Display → títulos grandes e itálicos
-       EB Garamond      → corpo de texto, elegante
-       DM Mono          → labels, datas, tags
-  ───────────────────────────────────────────── -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
-
   <style>
-
-    /* ═══════════════════════════════════════════
-       0. RESET & VARIÁVEIS GLOBAIS
-       Para mudar cores do site, altere só aqui.
-    ═══════════════════════════════════════════ */
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --cor-fundo:       #0c0b09;      /* preto quente — fundo geral         */
-      --cor-fundo-alt:   #111009;      /* preto levemente mais claro         */
-      --cor-papel:       #f4efe6;      /* branco creme — texto principal     */
-      --cor-dourado:     #b8955a;      /* dourado — acentos e labels         */
-      --cor-dourado-claro: #d4b07a;    /* dourado mais claro — destaque      */
-      --cor-dourado-dim: rgba(184, 149, 90, 0.15); /* dourado transparente   */
-      --cor-escuro-foto: #1a1814;      /* fundo quando foto não carrega      */
-
-      --fonte-titulo:  'Playfair Display', Georgia, serif;
-      --fonte-corpo:   'EB Garamond', Georgia, serif;
-      --fonte-mono:    'DM Mono', 'Courier New', monospace;
-
-      --gap-secao: 3px;   /* espaço entre blocos do grid */
+      --cor-fundo: #0c0b09; --cor-fundo-alt: #111009; --cor-papel: #f4efe6;
+      --cor-dourado: #b8955a; --cor-dourado-claro: #d4b07a;
+      --cor-dourado-dim: rgba(184,149,90,0.15); --cor-escuro-foto: #1a1814;
+      --fonte-titulo: 'Playfair Display', Georgia, serif;
+      --fonte-corpo: 'EB Garamond', Georgia, serif;
+      --fonte-mono: 'DM Mono', 'Courier New', monospace;
+      --gap: 3px;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--cor-fundo); color: var(--cor-papel); font-family: var(--fonte-corpo); overflow-x: hidden; cursor: none; }
+    * { cursor: none; }
+    #c-dot { width:8px; height:8px; background:var(--cor-dourado); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9999; opacity:0; }
+    #c-ring { width:30px; height:30px; border:1.5px solid rgba(184,149,90,0.55); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9998; opacity:0; transition:border-color 0.25s; }
+    .foto { background-color:var(--cor-escuro-foto); background-size:cover; background-position:center; position:relative; overflow:hidden; }
+    .foto::after { content:''; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.055'/%3E%3C/svg%3E"); pointer-events:none; mix-blend-mode:overlay; }
+    .foto-legenda { position:absolute; bottom:0; left:0; right:0; padding:28px 32px 24px; background:linear-gradient(to top,rgba(12,11,9,0.82),transparent); font-family:var(--fonte-corpo); font-style:italic; font-size:14px; color:rgba(244,239,230,0.6); z-index:3; }
+    .capitulo { display:flex; align-items:center; gap:36px; padding:80px 72px 44px; background:var(--cor-fundo); position:relative; overflow:hidden; }
+    .capitulo::before { content:''; position:absolute; top:0; left:72px; right:72px; height:1px; background:linear-gradient(to right,var(--cor-dourado),transparent); opacity:0.2; }
+    .capitulo-numero { font-family:var(--fonte-titulo); font-size:110px; font-weight:700; color:rgba(184,149,90,0.08); line-height:1; flex-shrink:0; user-select:none; }
+    .capitulo-label { display:block; font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.45em; color:var(--cor-dourado); text-transform:uppercase; margin-bottom:14px; }
+    .capitulo-titulo { font-family:var(--fonte-titulo); font-size:clamp(42px,5vw,72px); font-weight:700; line-height:0.95; color:var(--cor-papel); }
+    .capitulo-titulo em { font-style:italic; color:var(--cor-dourado-claro); }
+    .revelar { opacity:0; transform:translateY(32px); transition:opacity 1s ease,transform 1s ease; }
+    .revelar.visivel { opacity:1; transform:translateY(0); }
+    .revelar-esq { opacity:0; transform:translateX(-28px); transition:opacity 1s ease,transform 1s ease; }
+    .revelar-esq.visivel { opacity:1; transform:translateX(0); }
+    #abertura { width:100vw; height:100vh; position:relative; display:flex; align-items:flex-end; }
+    .foto-abertura { position:absolute; inset:0; }
+    .foto-abertura::before { content:''; position:absolute; inset:0; background:linear-gradient(to bottom,rgba(12,11,9,0.15) 0%,rgba(12,11,9,0) 35%,rgba(12,11,9,0) 55%,rgba(12,11,9,0.92) 100%); z-index:2; }
+    .abertura-texto { position:relative; z-index:3; padding:64px 72px; width:100%; }
+    .abertura-tag { font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.45em; color:var(--cor-dourado); text-transform:uppercase; margin-bottom:18px; display:flex; align-items:center; gap:16px; opacity:0; animation:subir 1s 0.4s both; }
+    .abertura-tag::before { content:''; display:block; width:36px; height:1px; background:var(--cor-dourado); }
+    .abertura-nome { font-family:var(--fonte-titulo); font-size:clamp(60px,10vw,148px); font-weight:700; line-height:0.86; letter-spacing:-0.01em; color:var(--cor-papel); opacity:0; animation:subir 1.2s 0.6s both; }
+    .abertura-nome em { font-style:italic; color:var(--cor-dourado-claro); }
+    .abertura-subtitulo { margin-top:22px; font-family:var(--fonte-corpo); font-style:italic; font-size:clamp(16px,2vw,23px); color:rgba(244,239,230,0.55); opacity:0; animation:subir 1s 0.9s both; }
+    .abertura-local { position:absolute; top:40px; right:60px; font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.28em; color:rgba(184,149,90,0.45); z-index:3; text-transform:uppercase; opacity:0; animation:aparecer 1s 1.4s both; }
+    .scroll-dica { position:absolute; right:60px; bottom:56px; z-index:3; display:flex; flex-direction:column; align-items:center; gap:10px; opacity:0; animation:aparecer 1s 1.8s both; }
+    .scroll-dica span { font-family:var(--fonte-mono); font-size:9px; letter-spacing:0.35em; color:var(--cor-dourado); text-transform:uppercase; writing-mode:vertical-lr; }
+    .scroll-dica::after { content:''; display:block; width:1px; height:56px; background:linear-gradient(to bottom,var(--cor-dourado),transparent); animation:pulso-linha 2.2s 2s infinite; }
+    #momentos { display:grid; grid-template-columns:1fr 1fr 1fr; height:68vh; }
+    .momento { position:relative; overflow:hidden; }
+    .momento .foto { width:100%; height:100%; transition:transform 0.9s cubic-bezier(0.25,0.46,0.45,0.94); }
+    .momento:hover .foto { transform:scale(1.06); }
+    .momento-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(12,11,9,0.94) 0%,rgba(12,11,9,0.3) 40%,transparent 70%); z-index:2; display:flex; flex-direction:column; justify-content:flex-end; padding:36px 32px; opacity:0; transition:opacity 0.45s ease; }
+    .momento:hover .momento-overlay { opacity:1; }
+    .momento-tag { font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.35em; color:var(--cor-dourado); text-transform:uppercase; margin-bottom:10px; }
+    .momento-frase { font-family:var(--fonte-titulo); font-size:21px; font-style:italic; color:var(--cor-papel); line-height:1.45; }
+    .momento + .momento { border-left:1px solid rgba(184,149,90,0.1); }
+    #editorial { display:grid; grid-template-columns:5fr 4fr; grid-template-rows:62vh 38vh; gap:var(--gap); background:rgba(184,149,90,0.07); }
+    .ed-foto-principal { grid-row:1/3; grid-column:1; position:relative; }
+    .ed-foto-detalhe { grid-row:1; grid-column:2; position:relative; }
+    .ed-citacao { grid-row:2; grid-column:2; background:#0c0b09; padding:48px 44px; display:flex; flex-direction:column; justify-content:center; border-top:1px solid rgba(184,149,90,0.08); }
+    .ed-aspas { font-family:var(--fonte-titulo); font-size:130px; color:rgba(184,149,90,0.1); line-height:0.65; margin-bottom:16px; user-select:none; }
+    .ed-texto { font-family:var(--fonte-corpo); font-style:italic; font-size:clamp(17px,1.8vw,25px); line-height:1.65; color:rgba(244,239,230,0.82); }
+    .ed-autor { margin-top:22px; font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.28em; color:var(--cor-dourado); text-transform:uppercase; }
+    #filmstrip { display:grid; grid-template-columns:repeat(5,1fr); height:40vh; gap:var(--gap); background:#0c0b09; border-top:1px solid rgba(184,149,90,0.12); border-bottom:1px solid rgba(184,149,90,0.12); }
+    .film-frame { position:relative; overflow:hidden; }
+    .film-frame .foto { width:100%; height:100%; filter:grayscale(35%) brightness(0.88); transition:transform 0.65s ease,filter 0.45s ease; }
+    .film-frame:hover .foto { transform:scale(1.1); filter:grayscale(0%) brightness(1); }
+    .film-frame::before { content:attr(data-num); position:absolute; top:12px; left:14px; font-family:var(--fonte-mono); font-size:9px; letter-spacing:0.2em; color:rgba(184,149,90,0.35); z-index:3; }
+    .duas-colunas { display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); background:rgba(184,149,90,0.05); }
+    .dc-foto { height:66vh; }
+    .dc-texto { height:66vh; background:var(--cor-fundo-alt); padding:72px 64px; display:flex; flex-direction:column; justify-content:center; position:relative; }
+    .dc-texto::before { content:''; position:absolute; left:0; top:15%; bottom:15%; width:1px; background:linear-gradient(to bottom,transparent,var(--cor-dourado),transparent); opacity:0.2; }
+    .invertido .dc-texto { order:-1; }
+    .invertido .dc-texto::before { left:auto; right:0; }
+    .dc-label { font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.42em; color:var(--cor-dourado); text-transform:uppercase; margin-bottom:22px; }
+    .dc-texto p { font-size:clamp(17px,1.5vw,22px); line-height:1.9; color:rgba(244,239,230,0.6); margin-bottom:18px; }
+    .dc-texto p strong { color:var(--cor-dourado-claro); font-weight:500; }
+    .mini-galeria { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:36px; height:148px; }
+    .mini-galeria .foto { width:100%; height:100%; }
+    #paixoes { display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:50vh 50vh; gap:var(--gap); background:rgba(184,149,90,0.05); }
+    .paixao-card { position:relative; overflow:hidden; }
+    .paixao-card.larga { grid-column:span 2; }
+    .paixao-card .foto { width:100%; height:100%; transition:transform 0.75s ease; }
+    .paixao-card:hover .foto { transform:scale(1.04); }
+    .paixao-info { position:absolute; inset:0; background:linear-gradient(145deg,rgba(12,11,9,0.78) 0%,transparent 65%); padding:38px 34px; z-index:2; display:flex; flex-direction:column; justify-content:flex-end; }
+    .paixao-icone { font-size:28px; margin-bottom:10px; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+    .paixao-nome { font-family:var(--fonte-titulo); font-size:27px; font-weight:700; color:var(--cor-papel); line-height:1.2; text-shadow:0 2px 12px rgba(0,0,0,0.6); }
+    .paixao-nota { font-style:italic; font-size:14px; color:rgba(244,239,230,0.48); margin-top:6px; }
+    #contato { height:92vh; position:relative; display:flex; align-items:center; justify-content:center; }
+    #contato .foto { position:absolute; inset:0; }
+    #contato::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center,rgba(12,11,9,0.4) 0%,rgba(12,11,9,0.75) 100%); z-index:2; }
+    .contato-conteudo { position:relative; z-index:3; text-align:center; padding:40px; }
+    .contato-conteudo h2 { font-family:var(--fonte-titulo); font-size:clamp(52px,8vw,108px); font-style:italic; line-height:0.92; color:var(--cor-papel); margin-bottom:20px; }
+    .contato-conteudo h2 span { display:block; font-size:0.55em; font-style:normal; font-family:var(--fonte-mono); letter-spacing:0.35em; color:var(--cor-dourado); text-transform:uppercase; margin-bottom:14px; }
+    .contato-sub { font-style:italic; font-size:19px; color:rgba(244,239,230,0.5); margin-bottom:52px; }
+    .botoes-contato { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+    .btn-solido { font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--cor-fundo); background:var(--cor-dourado); padding:15px 28px; text-decoration:none; transition:background 0.3s ease,transform 0.2s ease; display:inline-block; }
+    .btn-solido:hover { background:var(--cor-dourado-claro); transform:translateY(-2px); }
+    .btn-contorno { font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--cor-dourado); border:1px solid rgba(184,149,90,0.38); padding:15px 28px; text-decoration:none; transition:border-color 0.3s ease,background 0.3s ease,transform 0.2s ease; display:inline-block; }
+    .btn-contorno:hover { border-color:var(--cor-dourado); background:var(--cor-dourado-dim); transform:translateY(-2px); }
+    footer { padding:30px 72px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(184,149,90,0.09); }
+    .footer-assinatura { font-family:var(--fonte-titulo); font-style:italic; font-size:22px; color:var(--cor-dourado); }
+    .footer-copy { font-family:var(--fonte-mono); font-size:10px; letter-spacing:0.2em; color:rgba(244,239,230,0.2); }
+    @keyframes subir { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes aparecer { from{opacity:0} to{opacity:1} }
+    @keyframes pulso-linha { 0%{transform:scaleY(0);transform-origin:top;opacity:1} 100%{transform:scaleY(1);transform-origin:top;opacity:0} }
+    @media (max-width:768px) {
+      body { cursor:auto; } * { cursor:auto; } #c-dot,#c-ring { display:none; }
+      .abertura-texto{padding:40px 28px} .abertura-local{display:none}
+      .capitulo{padding:60px 28px 32px;flex-direction:column;gap:0} .capitulo-numero{font-size:64px}
+      #momentos{grid-template-columns:1fr;height:auto} .momento{height:58vw}
+      .momento+.momento{border-left:none;border-top:1px solid rgba(184,149,90,0.1)}
+      #editorial{grid-template-columns:1fr;grid-template-rows:auto}
+      .ed-foto-principal{grid-row:auto;height:56vw} .ed-foto-detalhe{height:56vw} .ed-citacao{padding:40px 28px}
+      #filmstrip{grid-template-columns:repeat(3,1fr);height:52vw}
+      .duas-colunas{grid-template-columns:1fr} .dc-foto{height:62vw} .dc-texto{height:auto;padding:48px 28px}
+      .invertido .dc-texto{order:0}
+      #paixoes{grid-template-columns:1fr;grid-template-rows:auto} .paixao-card.larga{grid-column:auto} .paixao-card{height:58vw}
+      #contato{height:auto;min-height:100vh}
+      footer{padding:28px;flex-direction:column;gap:10px;text-align:center}
     }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background: var(--cor-fundo);
-      color: var(--cor-papel);
-      font-family: var(--fonte-corpo);
-      overflow-x: hidden;
-      cursor: none; /* cursor customizado ativado no JS */
-    }
-
-
-    /* ═══════════════════════════════════════════
-       1. CURSOR CUSTOMIZADO
-       Ponto dourado + anel que segue o mouse.
-       Para desativar: apague esta seção e
-       remova cursor:none do body.
-    ═══════════════════════════════════════════ */
-    .cursor-ponto {
-      width: 7px;
-      height: 7px;
-      background: var(--cor-dourado);
-      border-radius: 50%;
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.08s ease, opacity 0.3s ease;
-    }
-
-    .cursor-anel {
-      width: 30px;
-      height: 30px;
-      border: 1px solid rgba(184, 149, 90, 0.45);
-      border-radius: 50%;
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s ease, height 0.3s ease,
-                  border-color 0.3s ease, opacity 0.3s ease;
-    }
-
-    /* cursor cresce ao passar em links */
-    .cursor-ponto.ativo { transform: translate(-50%, -50%) scale(2.5); }
-    .cursor-anel.ativo  { width: 50px; height: 50px; border-color: var(--cor-dourado); }
-
-
-    /* ═══════════════════════════════════════════
-       2. COMPONENTE: FOTO
-       Toda <div class="foto"> se comporta igual.
-       Adicione background-image via style=""
-       diretamente no HTML de cada elemento.
-    ═══════════════════════════════════════════ */
-    .foto {
-      background-color: var(--cor-escuro-foto);
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Película: granulação sutil sobre cada foto */
-    .foto::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.055'/%3E%3C/svg%3E");
-      pointer-events: none;
-      mix-blend-mode: overlay;
-    }
-
-    /* Legenda que aparece sobre fotos (rodapé interno) */
-    .foto-legenda {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 28px 32px 24px;
-      background: linear-gradient(to top, rgba(12,11,9,0.82), transparent);
-      font-family: var(--fonte-corpo);
-      font-style: italic;
-      font-size: 14px;
-      color: rgba(244, 239, 230, 0.6);
-      z-index: 3;
-    }
-
-
-    /* ═══════════════════════════════════════════
-       3. COMPONENTE: CABEÇALHO DE CAPÍTULO
-       Usado para separar seções com número grande.
-       Para adicionar nova seção, copie o bloco
-       <div class="capitulo"> e ajuste o conteúdo.
-    ═══════════════════════════════════════════ */
-    .capitulo {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      padding: 80px 72px 44px;
-      background: var(--cor-fundo);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Linha decorativa no topo do capítulo */
-    .capitulo::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 72px; right: 72px;
-      height: 1px;
-      background: linear-gradient(to right, var(--cor-dourado), transparent);
-      opacity: 0.2;
-    }
-
-    .capitulo-numero {
-      font-family: var(--fonte-titulo);
-      font-size: 110px;
-      font-weight: 700;
-      color: rgba(184, 149, 90, 0.08);
-      line-height: 1;
-      flex-shrink: 0;
-      user-select: none;
-    }
-
-    .capitulo-label {
-      display: block;
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.45em;
-      color: var(--cor-dourado);
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-
-    .capitulo-titulo {
-      font-family: var(--fonte-titulo);
-      font-size: clamp(42px, 5vw, 72px);
-      font-weight: 700;
-      line-height: 0.95;
-      color: var(--cor-papel);
-    }
-
-    .capitulo-titulo em {
-      font-style: italic;
-      color: var(--cor-dourado-claro);
-    }
-
-
-    /* ═══════════════════════════════════════════
-       4. ANIMAÇÃO DE ENTRADA AO ROLAR
-       Adicione class="revelar" em qualquer elemento
-       para ele aparecer suavemente ao entrar na tela.
-    ═══════════════════════════════════════════ */
-    .revelar {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 1s ease, transform 1s ease;
-    }
-
-    .revelar.visivel {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Variante: entra da esquerda */
-    .revelar-esq {
-      opacity: 0;
-      transform: translateX(-28px);
-      transition: opacity 1s ease, transform 1s ease;
-    }
-
-    .revelar-esq.visivel {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-
-    /* ═══════════════════════════════════════════
-       5. SEÇÃO: ABERTURA (HERO)
-       Foto em tela cheia com nome sobreposto.
-       Para trocar a foto: edite background-image
-       na div.foto-abertura no HTML.
-    ═══════════════════════════════════════════ */
-    #abertura {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-    }
-
-    .foto-abertura {
-      position: absolute;
-      inset: 0;
-    }
-
-    /* Gradiente escuro na parte de baixo para texto ficar legível */
-    .foto-abertura::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(12,11,9,0.15)  0%,
-        rgba(12,11,9,0.0)   35%,
-        rgba(12,11,9,0.0)   55%,
-        rgba(12,11,9,0.92) 100%
-      );
-      z-index: 2;
-    }
-
-    .abertura-texto {
-      position: relative;
-      z-index: 3;
-      padding: 64px 72px;
-      width: 100%;
-    }
-
-    .abertura-tag {
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.45em;
-      color: var(--cor-dourado);
-      text-transform: uppercase;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      opacity: 0;
-      animation: subir 1s 0.4s both;
-    }
-
-    .abertura-tag::before {
-      content: '';
-      display: block;
-      width: 36px;
-      height: 1px;
-      background: var(--cor-dourado);
-    }
-
-    .abertura-nome {
-      font-family: var(--fonte-titulo);
-      font-size: clamp(60px, 10vw, 148px);
-      font-weight: 700;
-      line-height: 0.86;
-      letter-spacing: -0.01em;
-      color: var(--cor-papel);
-      opacity: 0;
-      animation: subir 1.2s 0.6s both;
-    }
-
-    .abertura-nome em {
-      font-style: italic;
-      color: var(--cor-dourado-claro);
-    }
-
-    .abertura-subtitulo {
-      margin-top: 22px;
-      font-family: var(--fonte-corpo);
-      font-style: italic;
-      font-size: clamp(16px, 2vw, 23px);
-      color: rgba(244, 239, 230, 0.55);
-      opacity: 0;
-      animation: subir 1s 0.9s both;
-      letter-spacing: 0.02em;
-    }
-
-    /* Localidade no canto superior direito */
-    .abertura-local {
-      position: absolute;
-      top: 40px;
-      right: 60px;
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.28em;
-      color: rgba(184, 149, 90, 0.45);
-      z-index: 3;
-      text-transform: uppercase;
-      opacity: 0;
-      animation: aparecer 1s 1.4s both;
-    }
-
-    /* Seta de scroll no canto inferior direito */
-    .scroll-dica {
-      position: absolute;
-      right: 60px;
-      bottom: 56px;
-      z-index: 3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      opacity: 0;
-      animation: aparecer 1s 1.8s both;
-    }
-
-    .scroll-dica span {
-      font-family: var(--fonte-mono);
-      font-size: 9px;
-      letter-spacing: 0.35em;
-      color: var(--cor-dourado);
-      text-transform: uppercase;
-      writing-mode: vertical-lr;
-    }
-
-    .scroll-dica::after {
-      content: '';
-      display: block;
-      width: 1px;
-      height: 56px;
-      background: linear-gradient(to bottom, var(--cor-dourado), transparent);
-      animation: pulso-linha 2.2s 2s infinite;
-    }
-
-
-    /* ═══════════════════════════════════════════
-       6. SEÇÃO: TRÊS MOMENTOS
-       Grid 3 colunas — hover revela texto.
-       Para adicionar mais momentos: adicione
-       mais <div class="momento"> no HTML.
-       Altura ajustável em: height: 68vh
-    ═══════════════════════════════════════════ */
-    #momentos {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      height: 68vh;
-    }
-
-    .momento {
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .momento .foto {
-      width: 100%;
-      height: 100%;
-      transition: transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    .momento:hover .foto {
-      transform: scale(1.06);
-    }
-
-    /* Overlay com texto que aparece no hover */
-    .momento-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to top,
-        rgba(12,11,9,0.94) 0%,
-        rgba(12,11,9,0.3)  40%,
-        transparent        70%
-      );
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 36px 32px;
-      opacity: 0;
-      transition: opacity 0.45s ease;
-    }
-
-    .momento:hover .momento-overlay {
-      opacity: 1;
-    }
-
-    .momento-tag {
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.35em;
-      color: var(--cor-dourado);
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .momento-frase {
-      font-family: var(--fonte-titulo);
-      font-size: 21px;
-      font-style: italic;
-      color: var(--cor-papel);
-      line-height: 1.45;
-    }
-
-    .momento + .momento {
-      border-left: 1px solid rgba(184, 149, 90, 0.1);
-    }
-
-
-    /* ═══════════════════════════════════════════
-       7. SEÇÃO: SPREAD EDITORIAL
-       Foto grande à esquerda + citação à direita.
-       Para trocar as fotos, edite o background-image
-       das divs .ed-foto-principal e .ed-foto-detalhe
-    ═══════════════════════════════════════════ */
-    #editorial {
-      display: grid;
-      grid-template-columns: 5fr 4fr;
-      grid-template-rows: 62vh 38vh;
-      gap: var(--gap-secao);
-      background: rgba(184, 149, 90, 0.07);
-    }
-
-    .ed-foto-principal {
-      grid-row: 1 / 3;
-      grid-column: 1;
-      position: relative;
-    }
-
-    .ed-foto-detalhe {
-      grid-row: 1;
-      grid-column: 2;
-      position: relative;
-    }
-
-    /* Caixa de citação */
-    .ed-citacao {
-      grid-row: 2;
-      grid-column: 2;
-      background: #0c0b09;
-      padding: 48px 44px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border-top: 1px solid rgba(184, 149, 90, 0.08);
-    }
-
-    .ed-aspas {
-      font-family: var(--fonte-titulo);
-      font-size: 130px;
-      color: rgba(184, 149, 90, 0.1);
-      line-height: 0.65;
-      margin-bottom: 16px;
-      user-select: none;
-    }
-
-    .ed-texto {
-      font-family: var(--fonte-corpo);
-      font-style: italic;
-      font-size: clamp(17px, 1.8vw, 25px);
-      line-height: 1.65;
-      color: rgba(244, 239, 230, 0.82);
-    }
-
-    .ed-autor {
-      margin-top: 22px;
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.28em;
-      color: var(--cor-dourado);
-      text-transform: uppercase;
-    }
-
-
-    /* ═══════════════════════════════════════════
-       8. SEÇÃO: FILMSTRIP (tira de fotos)
-       5 fotos lado a lado, como película de câmera.
-       Ao hover: foto fica colorida e cresce.
-       Para adicionar fotos: insira mais .film-frame
-    ═══════════════════════════════════════════ */
-    #filmstrip {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      height: 40vh;
-      gap: var(--gap-secao);
-      background: #0c0b09;
-      border-top: 1px solid rgba(184, 149, 90, 0.12);
-      border-bottom: 1px solid rgba(184, 149, 90, 0.12);
-    }
-
-    .film-frame {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .film-frame .foto {
-      width: 100%;
-      height: 100%;
-      filter: grayscale(35%) brightness(0.88);
-      transition: transform 0.65s ease, filter 0.45s ease;
-    }
-
-    .film-frame:hover .foto {
-      transform: scale(1.1);
-      filter: grayscale(0%) brightness(1);
-    }
-
-    /* Número discreto em cada frame */
-    .film-frame::before {
-      content: attr(data-num);
-      position: absolute;
-      top: 12px;
-      left: 14px;
-      font-family: var(--fonte-mono);
-      font-size: 9px;
-      letter-spacing: 0.2em;
-      color: rgba(184, 149, 90, 0.35);
-      z-index: 3;
-    }
-
-
-    /* ═══════════════════════════════════════════
-       9. SEÇÃO: DUAS COLUNAS (foto + texto)
-       Usada para Motos e JiuJitsu.
-       Para adicionar nova seção igual:
-       copie o bloco <section class="duas-colunas">
-       e ajuste o conteúdo e a foto.
-       .invertido troca a ordem (texto à esquerda).
-    ═══════════════════════════════════════════ */
-    .duas-colunas {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--gap-secao);
-      background: rgba(184, 149, 90, 0.05);
-    }
-
-    .dc-foto {
-      height: 66vh;
-    }
-
-    .dc-texto {
-      height: 66vh;
-      background: var(--cor-fundo-alt);
-      padding: 72px 64px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-    }
-
-    /* Linha dourada vertical no lado interno do texto */
-    .dc-texto::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 15%;
-      bottom: 15%;
-      width: 1px;
-      background: linear-gradient(
-        to bottom,
-        transparent,
-        var(--cor-dourado),
-        transparent
-      );
-      opacity: 0.2;
-    }
-
-    .invertido .dc-texto {
-      order: -1; /* texto vem antes da foto */
-    }
-
-    .invertido .dc-texto::before {
-      left: auto;
-      right: 0; /* linha muda de lado */
-    }
-
-    .dc-label {
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.42em;
-      color: var(--cor-dourado);
-      text-transform: uppercase;
-      margin-bottom: 22px;
-    }
-
-    .dc-texto p {
-      font-size: clamp(17px, 1.5vw, 22px);
-      line-height: 1.9;
-      color: rgba(244, 239, 230, 0.6);
-      margin-bottom: 18px;
-    }
-
-    .dc-texto p strong {
-      color: var(--cor-dourado-claro);
-      font-weight: 500;
-    }
-
-    /* Mini galeria 2x1 dentro do texto */
-    .mini-galeria {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 36px;
-      height: 148px;
-    }
-
-    .mini-galeria .foto {
-      width: 100%;
-      height: 100%;
-    }
-
-
-    /* ═══════════════════════════════════════════
-       10. SEÇÃO: GRID DE PAIXÕES
-       4 cards em layout: wide(2cols) + 1col por linha.
-       Para adicionar nova paixão: insira novo par
-       .paixao-card.larga + .paixao-card no HTML.
-       Ajuste grid-template-rows para mais linhas.
-    ═══════════════════════════════════════════ */
-    #paixoes {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: 50vh 50vh;
-      gap: var(--gap-secao);
-      background: rgba(184, 149, 90, 0.05);
-    }
-
-    .paixao-card {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .paixao-card.larga {
-      grid-column: span 2; /* ocupa 2 colunas */
-    }
-
-    .paixao-card .foto {
-      width: 100%;
-      height: 100%;
-      transition: transform 0.75s ease;
-    }
-
-    .paixao-card:hover .foto {
-      transform: scale(1.04);
-    }
-
-    /* Info (ícone + nome) fica no canto inferior */
-    .paixao-info {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        145deg,
-        rgba(12,11,9,0.78) 0%,
-        transparent 65%
-      );
-      padding: 38px 34px;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-
-    .paixao-icone {
-      font-size: 28px;
-      margin-bottom: 10px;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
-    }
-
-    .paixao-nome {
-      font-family: var(--fonte-titulo);
-      font-size: 27px;
-      font-weight: 700;
-      color: var(--cor-papel);
-      line-height: 1.2;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.6);
-    }
-
-    .paixao-nota {
-      font-style: italic;
-      font-size: 14px;
-      color: rgba(244, 239, 230, 0.48);
-      margin-top: 6px;
-    }
-
-
-    /* ═══════════════════════════════════════════
-       11. SEÇÃO: FECHAMENTO / CONTATO
-       Foto de fundo com overlay escuro e links.
-       Para trocar a foto: edite background-image
-       na div.foto dentro de #contato no HTML.
-    ═══════════════════════════════════════════ */
-    #contato {
-      height: 92vh;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #contato .foto {
-      position: absolute;
-      inset: 0;
-    }
-
-    /* Overlay duplo: escurece + vinheta lateral */
-    #contato::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at center, rgba(12,11,9,0.4) 0%, rgba(12,11,9,0.75) 100%);
-      z-index: 2;
-    }
-
-    .contato-conteudo {
-      position: relative;
-      z-index: 3;
-      text-align: center;
-      padding: 40px;
-    }
-
-    .contato-conteudo h2 {
-      font-family: var(--fonte-titulo);
-      font-size: clamp(52px, 8vw, 108px);
-      font-style: italic;
-      line-height: 0.92;
-      color: var(--cor-papel);
-      margin-bottom: 20px;
-    }
-
-    .contato-conteudo h2 span {
-      display: block;
-      font-size: 0.55em;
-      font-style: normal;
-      font-family: var(--fonte-mono);
-      letter-spacing: 0.35em;
-      color: var(--cor-dourado);
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-
-    .contato-sub {
-      font-style: italic;
-      font-size: 19px;
-      color: rgba(244, 239, 230, 0.5);
-      margin-bottom: 52px;
-    }
-
-    /* Botões de contato */
-    .botoes-contato {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    /* Botão sólido dourado */
-    .btn-solido {
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--cor-fundo);
-      background: var(--cor-dourado);
-      padding: 15px 28px;
-      text-decoration: none;
-      transition: background 0.3s ease, transform 0.2s ease;
-      display: inline-block;
-    }
-
-    .btn-solido:hover {
-      background: var(--cor-dourado-claro);
-      transform: translateY(-2px);
-    }
-
-    /* Botão contorno */
-    .btn-contorno {
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--cor-dourado);
-      border: 1px solid rgba(184, 149, 90, 0.38);
-      padding: 15px 28px;
-      text-decoration: none;
-      transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease;
-      display: inline-block;
-    }
-
-    .btn-contorno:hover {
-      border-color: var(--cor-dourado);
-      background: var(--cor-dourado-dim);
-      transform: translateY(-2px);
-    }
-
-
-    /* ═══════════════════════════════════════════
-       12. RODAPÉ
-    ═══════════════════════════════════════════ */
-    footer {
-      padding: 30px 72px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid rgba(184, 149, 90, 0.09);
-    }
-
-    .footer-assinatura {
-      font-family: var(--fonte-titulo);
-      font-style: italic;
-      font-size: 22px;
-      color: var(--cor-dourado);
-    }
-
-    .footer-copy {
-      font-family: var(--fonte-mono);
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      color: rgba(244, 239, 230, 0.2);
-    }
-
-
-    /* ═══════════════════════════════════════════
-       13. KEYFRAMES (animações)
-    ═══════════════════════════════════════════ */
-    @keyframes subir {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes aparecer {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    @keyframes pulso-linha {
-      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
-      100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
-    }
-
-
-    /* ═══════════════════════════════════════════
-       14. RESPONSIVO — MOBILE
-       Abaixo de 768px, tudo vira 1 coluna.
-    ═══════════════════════════════════════════ */
-    @media (max-width: 768px) {
-      .abertura-texto       { padding: 40px 28px; }
-      .abertura-local       { display: none; }
-      .capitulo             { padding: 60px 28px 32px; flex-direction: column; gap: 0; }
-      .capitulo-numero      { font-size: 64px; }
-
-      #momentos             { grid-template-columns: 1fr; height: auto; }
-      .momento              { height: 58vw; }
-      .momento + .momento   { border-left: none; border-top: 1px solid rgba(184,149,90,0.1); }
-
-      #editorial            { grid-template-columns: 1fr; grid-template-rows: auto; }
-      .ed-foto-principal    { grid-row: auto; height: 56vw; }
-      .ed-foto-detalhe      { height: 56vw; }
-      .ed-citacao           { padding: 40px 28px; }
-
-      #filmstrip            { grid-template-columns: repeat(3, 1fr); height: 52vw; }
-
-      .duas-colunas         { grid-template-columns: 1fr; }
-      .dc-foto              { height: 62vw; }
-      .dc-texto             { height: auto; padding: 48px 28px; }
-      .invertido .dc-texto  { order: 0; }
-
-      #paixoes              { grid-template-columns: 1fr; grid-template-rows: auto; }
-      .paixao-card.larga    { grid-column: auto; }
-      .paixao-card          { height: 58vw; }
-
-      #contato              { height: auto; min-height: 100vh; }
-
-      footer                { padding: 28px; flex-direction: column; gap: 10px; text-align: center; }
-    }
-
   </style>
 </head>
 <body>
 
-  <!-- Cursor customizado (controlado pelo JS na seção de scripts) -->
-  <div class="cursor-ponto" id="cursorPonto"></div>
-  <div class="cursor-anel"  id="cursorAnel"></div>
+  <div id="c-dot"></div>
+  <div id="c-ring"></div>
 
-
-  <!-- ═══════════════════════════════════════════
-       ABERTURA
-       ▸ Troque background-image pelo caminho da sua foto principal
-       ▸ Exemplo: style="background-image: url('img/minha-foto.jpg')"
-  ═══════════════════════════════════════════ -->
   <section id="abertura">
-
-    <div class="foto-abertura foto" style="background-image: url('img/cachoeira.jpg');"></div>
-
+    <div class="foto-abertura foto" style="background-image:url('img/cachoeira.jpg');"></div>
     <span class="abertura-local">Guaramirim · SC · Brasil</span>
-
     <div class="abertura-texto">
       <p class="abertura-tag">Uma vida em imagens</p>
-      <h1 class="abertura-nome">
-        Rafael<br>
-        <em>Ubinski</em>
-      </h1>
+      <h1 class="abertura-nome">Rafael<br><em>Ubinski</em></h1>
       <p class="abertura-subtitulo">Designer · Motociclista · Lutador · Criador</p>
     </div>
-
-    <div class="scroll-dica">
-      <span>scroll</span>
-    </div>
-
+    <div class="scroll-dica"><span>scroll</span></div>
   </section>
 
-
-  <!-- ═══════════════════════════════════════════
-       3 MOMENTOS
-       ▸ Hover revela a frase de cada foto
-       ▸ Para trocar foto: edite url() em cada .foto
-       ▸ Para trocar texto: edite .momento-tag e .momento-frase
-  ═══════════════════════════════════════════ -->
   <div id="momentos">
-
     <div class="momento">
-      <div class="foto" style="background-image: url('img/moto-trilha.webp');"></div>
-      <div class="momento-overlay">
-        <p class="momento-tag">Paixão</p>
-        <p class="momento-frase">A trilha é como uma terapia —<br>acelerar é tirar um peso da vida.</p>
-      </div>
+      <div class="foto" style="background-image:url('img/moto-trilha.webp');"></div>
+      <div class="momento-overlay"><p class="momento-tag">Paixão</p><p class="momento-frase">A trilha é como uma terapia —<br>acelerar é tirar um peso da vida.</p></div>
     </div>
-
     <div class="momento">
-      <div class="foto" style="background-image: url('img/jiujitsu.webp');"></div>
-      <div class="momento-overlay">
-        <p class="momento-tag">Disciplina</p>
-        <p class="momento-frase">O tatame me ensinou<br>mais do que qualquer livro.</p>
-      </div>
+      <div class="foto" style="background-image:url('img/jiujitsu.webp');"></div>
+      <div class="momento-overlay"><p class="momento-tag">Disciplina</p><p class="momento-frase">O tatame me ensinou<br>mais do que qualquer livro.</p></div>
     </div>
-
     <div class="momento">
-      <div class="foto" style="background-image: url('img/18-anos.webp');"></div>
-      <div class="momento-overlay">
-        <p class="momento-tag">Aniversário</p>
-        <p class="momento-frase">Aos 18 percebi: estar com<br>quem você ama já é tudo.</p>
-      </div>
+      <div class="foto" style="background-image:url('img/18-anos.webp');"></div>
+      <div class="momento-overlay"><p class="momento-tag">Aniversário</p><p class="momento-frase">Aos 18 percebi: estar com<br>quem você ama já é tudo.</p></div>
     </div>
-
   </div>
 
-
-  <!-- ═══════════════════════════════════════════
-       CAPÍTULO 1 — Cabeçalho de seção
-  ═══════════════════════════════════════════ -->
   <div class="capitulo">
     <div class="capitulo-numero">01</div>
-    <div>
-      <span class="capitulo-label">Quem sou</span>
-      <h2 class="capitulo-titulo">Uma vida<br><em>vivida de frente</em></h2>
-    </div>
+    <div><span class="capitulo-label">Quem sou</span><h2 class="capitulo-titulo">Uma vida<br><em>vivida de frente</em></h2></div>
   </div>
 
-
-  <!-- ═══════════════════════════════════════════
-       SPREAD EDITORIAL
-       ▸ ed-foto-principal → foto grande à esquerda
-       ▸ ed-foto-detalhe   → foto menor à direita
-       ▸ ed-citacao        → sua frase favorita
-  ═══════════════════════════════════════════ -->
   <section id="editorial">
-
-    <div class="ed-foto-principal foto" style="background-image: url('img/foto-rafael-1.jpeg');">
-      <div class="foto-legenda">Rafael Ubinski — Guaramirim, SC</div>
-    </div>
-
-    <div class="ed-foto-detalhe foto" style="background-image: url('img/foto-rafael-2.webp');"></div>
-
+    <div class="ed-foto-principal foto" style="background-image:url('img/foto-rafael-1.jpeg');"><div class="foto-legenda">Rafael Ubinski — Guaramirim, SC</div></div>
+    <div class="ed-foto-detalhe foto" style="background-image:url('img/foto-rafael-2.webp');"></div>
     <div class="ed-citacao">
       <div class="ed-aspas revelar">"</div>
-      <p class="ed-texto revelar">
-        A excelência não é um ato, é um hábito.
-        Cada detalhe importa — no código,
-        no tatame, na curva da trilha.
-      </p>
+      <p class="ed-texto revelar">A excelência não é um ato, é um hábito. Cada detalhe importa — no código, no tatame, na curva da trilha.</p>
       <p class="ed-autor revelar">— Rafael Ubinski</p>
     </div>
-
   </section>
 
-
-  <!-- ═══════════════════════════════════════════
-       FILMSTRIP — tira de fotos
-       ▸ data-num="01" define o número no canto
-       ▸ Para adicionar mais fotos: adicione um
-         novo .film-frame no HTML e ajuste
-         grid-template-columns para repeat(6, 1fr)
-  ═══════════════════════════════════════════ -->
   <div id="filmstrip">
-    <div class="film-frame" data-num="01"><div class="foto" style="background-image: url('img/foto-rafael-2.webp');"></div></div>
-    <div class="film-frame" data-num="02"><div class="foto" style="background-image: url('img/foto-rafael-3.webp');"></div></div>
-    <div class="film-frame" data-num="03"><div class="foto" style="background-image: url('img/foto-rafael-1.jpeg');"></div></div>
-    <div class="film-frame" data-num="04"><div class="foto" style="background-image: url('img/foto-rafael-4.webp');"></div></div>
-    <div class="film-frame" data-num="05"><div class="foto" style="background-image: url('img/foto-rafael-5.webp');"></div></div>
+    <div class="film-frame" data-num="01"><div class="foto" style="background-image:url('img/foto-rafael-2.webp');"></div></div>
+    <div class="film-frame" data-num="02"><div class="foto" style="background-image:url('img/foto-rafael-3.webp');"></div></div>
+    <div class="film-frame" data-num="03"><div class="foto" style="background-image:url('img/foto-rafael-1.jpeg');"></div></div>
+    <div class="film-frame" data-num="04"><div class="foto" style="background-image:url('img/foto-rafael-4.webp');"></div></div>
+    <div class="film-frame" data-num="05"><div class="foto" style="background-image:url('img/foto-rafael-5.webp');"></div></div>
   </div>
 
-
-  <!-- ═══════════════════════════════════════════
-       CAPÍTULO 2 — Cabeçalho de seção
-  ═══════════════════════════════════════════ -->
   <div class="capitulo">
     <div class="capitulo-numero">02</div>
-    <div>
-      <span class="capitulo-label">O mundo que me move</span>
-      <h2 class="capitulo-titulo">Paixões<br></em></h2>
-    </div>
+    <div><span class="capitulo-label">O mundo que me move</span><h2 class="capitulo-titulo">Paixões<br><em>que formam</em></h2></div>
   </div>
 
-
-  <!-- ═══════════════════════════════════════════
-       DUAS COLUNAS — Motos
-       ▸ Foto à esquerda, texto à direita
-       ▸ Para nova seção igual: copie este bloco
-  ═══════════════════════════════════════════ -->
   <section class="duas-colunas">
-
-    <div class="dc-foto foto" style="background-image: url('img/moto-trilha2.jpg');">
-      <div class="foto-legenda">Nas trilhas de Santa Catarina</div>
-    </div>
-
+    <div class="dc-foto foto" style="background-image:url('img/moto-trilha2.jpg');"><div class="foto-legenda">Nas trilhas de Santa Catarina</div></div>
     <div class="dc-texto revelar">
       <span class="dc-label">Motos & Aventura</span>
       <p>Sou apaixonado por <strong>motos de trilha</strong> — a liberdade de entrar na mata, o barulho do motor e o silêncio que vem depois.</p>
       <p>É onde o mundo desacelera e eu ando mais rápido do que tudo.</p>
       <div class="mini-galeria">
-        <div class="foto" style="background-image: url('img/trilha.jpg');"></div>
-        <div class="foto" style="background-image: url('img/moto.jpg');"></div>
+        <div class="foto" style="background-image:url('img/trilha.jpg');"></div>
+        <div class="foto" style="background-image:url('img/moto.jpg');"></div>
       </div>
     </div>
-
   </section>
 
-
-  <!-- ═══════════════════════════════════════════
-       DUAS COLUNAS — JiuJitsu
-       ▸ Classe "invertido" troca a ordem: texto à esquerda
-  ═══════════════════════════════════════════ -->
-  <section class="duas-colunas invertido" style="margin-top: var(--gap-secao);">
-
-    <div class="dc-foto foto" style="background-image: url('img/jiujitsu-2.webp');">
-      <div class="foto-legenda">O tatame como refúgio mental</div>
-    </div>
-
+  <section class="duas-colunas invertido" style="margin-top:var(--gap);">
+    <div class="dc-foto foto" style="background-image:url('img/jiujitsu-2.webp');"><div class="foto-legenda">O tatame como refúgio mental</div></div>
     <div class="dc-texto revelar">
       <span class="dc-label">JiuJitsu</span>
       <p>No tatame aprendi que <strong>persistência vence talento</strong> quando o talento não se esforça.</p>
-      <p></p>
+      <p>Cada treino é uma aula de humildade, estratégia e presença.</p>
       <div class="mini-galeria">
-        <div class="foto" style="background-image: url('img/jiujitsu-3.webp');"></div>
-        <div class="foto" style="background-image: url('img/treino.webp');"></div>
+        <div class="foto" style="background-image:url('img/jiujitsu-3.webp');"></div>
+        <div class="foto" style="background-image:url('img/treino.webp');"></div>
       </div>
     </div>
-
   </section>
 
-
-  <!-- ═══════════════════════════════════════════
-       CAPÍTULO 3 — Cabeçalho de seção
-  ═══════════════════════════════════════════ -->
-  <div class="capitulo" style="margin-top: var(--gap-secao);">
+  <div class="capitulo" style="margin-top:var(--gap);">
     <div class="capitulo-numero">03</div>
-    <div>
-      <span class="capitulo-label">Criação</span>
-      <h2 class="capitulo-titulo">O que<br><em>faço existir</em></h2>
-    </div>
+    <div><span class="capitulo-label">Criação</span><h2 class="capitulo-titulo">O que<br><em>faço existir</em></h2></div>
   </div>
 
-
-  <!-- ═══════════════════════════════════════════
-       GRID DE PAIXÕES
-       Layout: Linha 1 → Escola (larga) + Carros
-               Linha 2 → Programação (larga) + Natureza
-       ▸ Para nova paixão: adicione novo par
-         .paixao-card.larga + .paixao-card
-         e aumente grid-template-rows para 3x
-  ═══════════════════════════════════════════ -->
   <section id="paixoes">
-
-    <!-- Linha 1: Escola (ocupa 2 colunas) -->
     <div class="paixao-card larga">
-      <div class="foto" style="background-image: url('img/regente.jpg'); height: 100%;"></div>
-      <div class="paixao-info">
-        <span class="paixao-icone">🎓</span>
-        <p class="paixao-nome">Escola</p>
-        <p class="paixao-nota">Análise e Desenvolvimento de Software e Prototipagem</p>
-      </div>
+      <div class="foto" style="background-image:url('img/regente.jpg');height:100%;"></div>
+      <div class="paixao-info"><span class="paixao-icone">🎓</span><p class="paixao-nome">Escola</p><p class="paixao-nota">Análise e Desenvolvimento de Software e Prototipagem</p></div>
     </div>
-
-    <!-- Linha 1: Carros (1 coluna) -->
     <div class="paixao-card">
-      <div class="foto" style="background-image: url('img/tiguan.webp'); height: 100%;"></div>
-      <div class="paixao-info">
-        <span class="paixao-icone">🚗</span>
-        <p class="paixao-nome">Carros</p>
-        <p class="paixao-nota">Mecânica e estética como arte</p>
-      </div>
+      <div class="foto" style="background-image:url('img/tiguan.webp');height:100%;"></div>
+      <div class="paixao-info"><span class="paixao-icone">🚗</span><p class="paixao-nome">Carros</p><p class="paixao-nota">Mecânica e estética como arte</p></div>
     </div>
-
-    <!-- Linha 2: Programação (ocupa 2 colunas) -->
     <div class="paixao-card larga">
-      <div class="foto" style="background-image: url('img/programacao.png'); height: 100%;"></div>
-      <div class="paixao-info">
-        <span class="paixao-icone">💻</span>
-        <p class="paixao-nome">Programação</p>
-        <p class="paixao-nota">Código como linguagem criativa</p>
-      </div>
+      <div class="foto" style="background-image:url('img/programacao.png');height:100%;"></div>
+      <div class="paixao-info"><span class="paixao-icone">💻</span><p class="paixao-nome">Programação</p><p class="paixao-nota">Código como linguagem criativa</p></div>
     </div>
-
-    <!-- Linha 2: Natureza (1 coluna) -->
     <div class="paixao-card">
-      <div class="foto" style="background-image: url('img/aventura.webp'); height: 100%;"></div>
-      <div class="paixao-info">
-        <span class="paixao-icone">🌲</span>
-        <p class="paixao-nome">Natureza</p>
-        <p class="paixao-nota">A trilha como terapia</p>
-      </div>
+      <div class="foto" style="background-image:url('img/aventura.webp');height:100%;"></div>
+      <div class="paixao-info"><span class="paixao-icone">🌲</span><p class="paixao-nome">Natureza</p><p class="paixao-nota">A trilha como terapia</p></div>
     </div>
-
   </section>
 
-
-  <!-- ═══════════════════════════════════════════
-       CONTATO / FECHAMENTO
-       ▸ Troque a foto de fundo em url()
-       ▸ Edite os links href dos botões
-  ═══════════════════════════════════════════ -->
   <section id="contato">
-
-    <div class="foto" style="background-image: url('img/foto-rafael-1.jpeg');"></div>
-
+    <div class="foto" style="background-image:url('img/foto-rafael-1.jpeg');"></div>
     <div class="contato-conteudo">
-      <h2>
-        <span>Contatos</span>
-        
-      </h2>
+      <h2><span>Contatos</span></h2>
       <p class="contato-sub">Aberto a projetos, parcerias e boas histórias.</p>
       <div class="botoes-contato">
-        <a href="https://www.instagram.com/rafaelub.sk/" class="btn-solido"   target="_blank">📸 Instagram</a>
-        <a href="https://wa.me/5547999410049"            class="btn-solido"   target="_blank">💬 WhatsApp</a>
-        <a href="mailto:rafaelubinskii@gmail.com"        class="btn-contorno"               >✉️ Email</a>
+        <a href="https://www.instagram.com/rafaelub.sk/" class="btn-solido" target="_blank">📸 Instagram</a>
+        <a href="https://wa.me/5547999410049" class="btn-solido" target="_blank">💬 WhatsApp</a>
+        <a href="mailto:rafaelubinskii@gmail.com" class="btn-contorno">✉️ Email</a>
       </div>
     </div>
-
   </section>
 
-
-  <!-- ═══════════════════════════════════════════
-       RODAPÉ
-  ═══════════════════════════════════════════ -->
   <footer>
     <span class="footer-assinatura">Rafael Ubinski</span>
     <span class="footer-copy">© 2025 — Guaramirim, SC</span>
   </footer>
 
-
-  <!-- ═══════════════════════════════════════════
-       SCRIPTS
-  ═══════════════════════════════════════════ -->
   <script>
+    var dot  = document.getElementById('c-dot');
+    var ring = document.getElementById('c-ring');
+    var mx = -100, my = -100, rx = -100, ry = -100;
 
-    /* ── 1. CURSOR CUSTOMIZADO ─────────────────
-       Segue o mouse com um ponto e um anel.
-       Cresce ao passar em links/botões.
-    ──────────────────────────────────────────── */
-    const ponto = document.getElementById('cursorPonto');
-    const anel  = document.getElementById('cursorAnel');
-    let mx = 0, my = 0;   // posição do mouse
-    let ax = 0, ay = 0;   // posição animada do anel
-
-    document.addEventListener('mousemove', (e) => {
-      mx = e.clientX;
-      my = e.clientY;
-      // ponto segue o mouse imediatamente
-      ponto.style.left = mx + 'px';
-      ponto.style.top  = my + 'px';
+    document.addEventListener('mousemove', function(e) {
+      mx = e.clientX; my = e.clientY;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+      dot.style.left = (mx - 4) + 'px';
+      dot.style.top  = (my - 4) + 'px';
     });
 
-    // anel segue suavemente com interpolação
-    function animarAnel() {
-      ax += (mx - ax) * 0.11;
-      ay += (my - ay) * 0.11;
-      anel.style.left = ax + 'px';
-      anel.style.top  = ay + 'px';
-      requestAnimationFrame(animarAnel);
-    }
-    animarAnel();
+    (function loop() {
+      rx += (mx - rx) * 0.13;
+      ry += (my - ry) * 0.13;
+      ring.style.left = (rx - 15) + 'px';
+      ring.style.top  = (ry - 15) + 'px';
+      requestAnimationFrame(loop);
+    })();
 
-    // Cresce ao passar em links
-    document.querySelectorAll('a, button').forEach((el) => {
-      el.addEventListener('mouseenter', () => {
-        ponto.classList.add('ativo');
-        anel.classList.add('ativo');
-      });
-      el.addEventListener('mouseleave', () => {
-        ponto.classList.remove('ativo');
-        anel.classList.remove('ativo');
-      });
+    document.querySelectorAll('a, button').forEach(function(el) {
+      el.addEventListener('mouseenter', function() { ring.style.borderColor = '#b8955a'; });
+      el.addEventListener('mouseleave', function() { ring.style.borderColor = 'rgba(184,149,90,0.55)'; });
     });
 
-
-    /* ── 2. ANIMAÇÃO DE ENTRADA AO ROLAR ───────
-       Elementos com class="revelar" aparecem
-       suavemente quando entram na tela.
-    ──────────────────────────────────────────── */
-    const observador = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visivel');
-        }
-      });
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visivel'); });
     }, { threshold: 0.13 });
+    document.querySelectorAll('.revelar, .revelar-esq').forEach(function(el) { obs.observe(el); });
 
-    document.querySelectorAll('.revelar, .revelar-esq').forEach((el) => {
-      observador.observe(el);
-    });
-
-
-    /* ── 3. SCROLL SUAVE em links internos ─────
-       Links com href="#secao" rolam suavemente.
-    ──────────────────────────────────────────── */
-    document.querySelectorAll('a[href^="#"]').forEach((link) => {
-      link.addEventListener('click', (e) => {
+    document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+      link.addEventListener('click', function(e) {
         e.preventDefault();
-        const alvo = document.querySelector(link.getAttribute('href'));
+        var alvo = document.querySelector(link.getAttribute('href'));
         if (alvo) alvo.scrollIntoView({ behavior: 'smooth' });
       });
     });
-
   </script>
 
 </body>
